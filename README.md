@@ -67,9 +67,17 @@ You can also specify a custom host:
 
 ### Docker
 
+#### Using Pre-built Image
+
+A pre-built Docker image is available from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/kevensen/gollama-mcp-server:latest
+```
+
 #### Building the Docker Image
 
-Build the Docker image from the repository root:
+Alternatively, build the Docker image locally from the repository root:
 
 ```bash
 docker build -t gollama-mcp-server .
@@ -77,7 +85,13 @@ docker build -t gollama-mcp-server .
 
 #### Running with Docker
 
-Run the server in HTTP mode (port 8080):
+Run the server in HTTP mode (port 8080) using the pre-built image:
+
+```bash
+docker run -p 8080:8080 ghcr.io/kevensen/gollama-mcp-server:latest
+```
+
+Or use your locally built image:
 
 ```bash
 docker run -p 8080:8080 gollama-mcp-server
@@ -87,16 +101,16 @@ If your Ollama instance is running on the host machine, use host networking:
 
 ```bash
 # Linux
-docker run --network host gollama-mcp-server
+docker run --network host ghcr.io/kevensen/gollama-mcp-server:latest
 
 # macOS/Windows - use host.docker.internal
-docker run -p 8080:8080 -e OLLAMA_HOST=http://host.docker.internal:11434 gollama-mcp-server
+docker run -p 8080:8080 -e OLLAMA_HOST=http://host.docker.internal:11434 ghcr.io/kevensen/gollama-mcp-server:latest
 ```
 
 To connect to a remote Ollama instance:
 
 ```bash
-docker run -p 8080:8080 -e OLLAMA_HOST=http://your-ollama-host:11434 gollama-mcp-server
+docker run -p 8080:8080 -e OLLAMA_HOST=http://your-ollama-host:11434 ghcr.io/kevensen/gollama-mcp-server:latest
 ```
 
 Run in detached mode with automatic restart:
@@ -106,7 +120,7 @@ docker run -d --restart unless-stopped \
   -p 8080:8080 \
   -e OLLAMA_HOST=http://host.docker.internal:11434 \
   --name gollama-mcp \
-  gollama-mcp-server
+  ghcr.io/kevensen/gollama-mcp-server:latest
 ```
 
 ## Tool Usage Examples
