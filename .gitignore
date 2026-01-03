@@ -34,3 +34,5 @@ go.work.sum
 *.code-workspace
 go.work
 go.work.sum
+
+bin/*

@@ -1,8 +1,10 @@
 package mcp
 
 import (
+	"context"
 	"log/slog"
 
+	"github.com/mark3labs/mcp-go/mcp"
 	mcp_go "github.com/mark3labs/mcp-go/mcp"
 	mcp_go_server "github.com/mark3labs/mcp-go/server"
 )
@@ -14,6 +16,15 @@ type Server struct {
 }
 
 func NewServer() *Server {
+	hooks := &mcp_go_server.Hooks{}
+
+	hooks.AddBeforeCallTool(func(ctx context.Context, id any, message *mcp.CallToolRequest) {
+		slog.InfoContext(ctx, "beforeCallTool", slog.Any("id", id), slog.Any("message", message))
+	})
+	hooks.AddAfterCallTool(func(ctx context.Context, id any, message *mcp.CallToolRequest, result *mcp.CallToolResult) {
+		slog.InfoContext(ctx, "afterCallTool", slog.Any("id", id), slog.Any("message", message), slog.Any("result", result))
+	})
+
 	client, err := NewOllamaClient()
 	if err != nil {
 		slog.Error("Failed to create Ollama client", "error", err)
@@ -26,6 +37,7 @@ func NewServer() *Server {
 			"1.0.0",
 			mcp_go_server.WithToolCapabilities(true),
 			mcp_go_server.WithLogging(),
+			mcp_go_server.WithHooks(hooks),
 		),
 		OllamaClient: client,
 	}
@@ -54,6 +66,7 @@ func (s *Server) registerTools() {
 			mcp_go.WithString("model", mcp_go.Required()),
 			mcp_go.WithBoolean("insecure"),
 			mcp_go.WithBoolean("stream"),
+			mcp_go.WithOpenWorldHintAnnotation(true),
 		),
 		s.PullModel)
 
@@ -65,6 +78,7 @@ func (s *Server) registerTools() {
 			mcp_go.WithString("model", mcp_go.Required()),
 			mcp_go.WithBoolean("insecure"),
 			mcp_go.WithBoolean("stream"),
+			mcp_go.WithOpenWorldHintAnnotation(true),
 		),
 		s.PushModel)
 
@@ -74,6 +88,8 @@ func (s *Server) registerTools() {
 			"deleteModel",
 			mcp_go.WithDescription("Delete a model from the local Ollama instance."),
 			mcp_go.WithString("model", mcp_go.Required()),
+			mcp_go.WithOpenWorldHintAnnotation(true),
+			mcp_go.WithDestructiveHintAnnotation(true),
 		),
 		s.DeleteModel)
 
